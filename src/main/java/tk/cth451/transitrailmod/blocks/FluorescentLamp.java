@@ -8,6 +8,7 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -34,6 +35,8 @@ public class FluorescentLamp extends CustomDirectionBlock {
 		this.setDefaultState(getDefaultState()
 				.withProperty(ATTACH, EnumAttachTo.WALL)
 				.withProperty(FACING, EnumFacing.NORTH));
+		this.translucent = true;
+		this.fullBlock = false;
 	}
 	
 	// Properties
@@ -113,10 +116,10 @@ public class FluorescentLamp extends CustomDirectionBlock {
 	
 	// Interactions
 	@Override
-	public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ,
-			int meta, EntityLivingBase placer) {
+	public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ,
+											int meta, EntityLivingBase placer, ItemStack stack) {
 		// set facing to the direction player is facing
-		IBlockState state = super.onBlockPlaced(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
+		IBlockState state = super.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer, stack);
 		state = this.getAttached(worldIn, pos, state);
 		return this.getFacingState(state, placer);
 	}

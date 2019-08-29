@@ -26,6 +26,7 @@ public class TicketMachine extends Block {
 		this.setUnlocalizedName("ticket_machine");
 		this.setCreativeTab(TransitRailMod.tabTransitRail);
 		this.setDefaultState(this.getDefaultState().withProperty(FACING, EnumFacing.NORTH));
+		this.fullBlock = false;
 	}
 	
 	@Override
@@ -65,9 +66,10 @@ public class TicketMachine extends Block {
 	
 	// Interactions
 	@Override
-	public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer){
+	public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ,
+											int meta, EntityLivingBase placer, ItemStack stack){
 		// set facing to the direction player is facing
-		IBlockState state = super.onBlockPlaced(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
+		IBlockState state = super.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer, stack);
 		return this.getFacingState(state, placer);
 	}
 	

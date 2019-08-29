@@ -73,7 +73,7 @@ public class InventoryTicketMachineOutput implements IInventory {
 	public void markDirty() {}
 
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer player) {
+	public boolean isUsableByPlayer(EntityPlayer entityPlayer) {
 		return true;
 	}
 
