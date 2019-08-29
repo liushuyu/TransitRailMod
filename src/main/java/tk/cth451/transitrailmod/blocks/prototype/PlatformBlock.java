@@ -9,6 +9,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -58,9 +59,9 @@ public abstract class PlatformBlock extends CustomDirectionBlock {
 	// Interactions
 	@Override
 	public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ,
-											int meta, EntityLivingBase placer, ItemStack stack){
+											int meta, EntityLivingBase placer, EnumHand hand){
 		// set facing to the direction player is facing
-		IBlockState state = super.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer, stack);
+		IBlockState state = super.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer, hand);
 		return this.getFacingState(state, placer);
 	}
 	
@@ -69,7 +70,7 @@ public abstract class PlatformBlock extends CustomDirectionBlock {
 		BlockPos posToCheck = this.isUpper(worldIn, pos) ? pos.down() : pos.up();
 		if (worldIn.getBlockState(posToCheck).getBlock() != this) {
 			worldIn.setBlockToAir(pos);
-			worldIn.notifyBlockOfStateChange(pos.up(), this);
+			worldIn.notifyNeighborsOfStateChange(pos.up(), this, false);
 		}
 	}
 	

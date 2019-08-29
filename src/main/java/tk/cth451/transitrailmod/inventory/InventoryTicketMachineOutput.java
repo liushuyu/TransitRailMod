@@ -5,6 +5,8 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 
+import java.util.Arrays;
+
 // []
 // 1
 // 1 = Ticket out
@@ -30,6 +32,12 @@ public class InventoryTicketMachineOutput implements IInventory {
 	@Override
 	public int getSizeInventory() {
 		return 1;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		// TODO: is this correct?
+		return false;
 	}
 
 	@Override
@@ -103,9 +111,7 @@ public class InventoryTicketMachineOutput implements IInventory {
 
 	@Override
 	public void clear() {
-		for (int i = 0; i < invStack.length; i++) {
-			invStack[i] = null;
-		}
+		Arrays.fill(invStack, null);
 	}
 
 	@Override

@@ -72,7 +72,7 @@ public class WirePanel extends CustomDirectionBlock {
 	// Block States
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, new IProperty[] {FACING, LAMP, SHUT});
+		return new BlockStateContainer(this, FACING, LAMP, SHUT);
 	}
 	
 	// meta: 3211
@@ -115,7 +115,7 @@ public class WirePanel extends CustomDirectionBlock {
 		EnumFacing sideToProvide = ((EnumFacing) state.getValue(FACING)).getOpposite();
 		state = state.withProperty(LAMP, this.checkLampPresent(world, pos));
 		((World) world).setBlockState(pos, state);
-		((World) world).notifyBlockOfStateChange(pos.offset(sideToProvide), this);
+		((World) world).notifyNeighborsOfStateChange(pos.offset(sideToProvide), this, false);
 	}
 	
 	@Override
@@ -129,7 +129,7 @@ public class WirePanel extends CustomDirectionBlock {
 	}
 	
 	protected boolean checkLampPresent(IBlockAccess worldIn, BlockPos pos) {
-		return worldIn.getBlockState(pos.up()).getBlock() == ModBlocks.fluorescent_lamp ? true : worldIn.getBlockState(pos.up()).getBlock() == ModBlocks.noise_barrier_with_lamp;
+		return worldIn.getBlockState(pos.up()).getBlock() == ModBlocks.fluorescent_lamp || worldIn.getBlockState(pos.up()).getBlock() == ModBlocks.noise_barrier_with_lamp;
 	}
 	
 	protected boolean checkIsExtendingAbove(IBlockAccess worldIn, BlockPos pos) {
@@ -137,8 +137,8 @@ public class WirePanel extends CustomDirectionBlock {
 	}
 	
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn,
-			EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand,
+									EnumFacing facing, float hitX, float hitY, float hitZ)  {
 		if (playerIn.getHeldItemMainhand() != null) {
 			if (playerIn.getHeldItemMainhand().getItem() == ModItems.style_changer){
 				worldIn.setBlockState(pos, state.cycleProperty(SHUT));

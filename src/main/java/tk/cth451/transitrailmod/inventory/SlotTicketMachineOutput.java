@@ -22,7 +22,8 @@ public class SlotTicketMachineOutput extends Slot {
 	}
 	
 	@Override
-	public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack) {
+	public ItemStack onTake(EntityPlayer playerIn, ItemStack stack) {
 		invIn.clear();
+		return stack;
 	}
 }

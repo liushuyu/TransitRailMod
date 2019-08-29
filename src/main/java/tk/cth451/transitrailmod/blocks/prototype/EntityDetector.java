@@ -94,7 +94,7 @@ public abstract class EntityDetector extends CustomDirectionBlock {
 	protected void updateState(IBlockState state, World worldIn, BlockPos pos) {
 		worldIn.setBlockState(pos, state.withProperty(POWERED, givePower(worldIn, pos) > 0));
 		EnumFacing facing = (EnumFacing) worldIn.getBlockState(pos).getValue(FACING);
-		worldIn.notifyNeighborsOfStateChange(pos.offset(facing), this);
+		worldIn.notifyNeighborsOfStateChange(pos.offset(facing), this, true);
 	}
 	
 	protected AxisAlignedBB getSpaceToCheck(World worldIn, BlockPos pos){
