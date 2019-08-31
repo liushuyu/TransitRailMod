@@ -39,7 +39,7 @@ public class WirePanelCorner extends Block {
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
 		EnumCorner corner = (EnumCorner) state.getValue(CORNER);
-		if ((Boolean) state.getValue(CONCAVE)) {
+		if (state.getValue(CONCAVE)) {
 			return new AxisAlignedBB(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 		} else {
 			if (corner == EnumCorner.SE) {
@@ -114,7 +114,7 @@ public class WirePanelCorner extends Block {
 	// Block States
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, new IProperty[] {CORNER, CONCAVE});
+		return new BlockStateContainer(this, CORNER, CONCAVE);
 	}
 	
 	// meta: 0211
@@ -123,7 +123,7 @@ public class WirePanelCorner extends Block {
 	@Override
 	public int getMetaFromState(IBlockState state) {
 		int mCorner = ((EnumCorner) state.getValue(CORNER)).toMeta();
-		int mConcave = (Boolean) state.getValue(CONCAVE) ? 1 : 0;
+		int mConcave = state.getValue(CONCAVE) ? 1 : 0;
 		return mConcave * 4 + mCorner;
 	}
 	

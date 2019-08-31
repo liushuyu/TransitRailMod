@@ -8,6 +8,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import tk.cth451.transitrailmod.ModOptions;
@@ -34,47 +36,56 @@ public class TrainTicket extends Item {
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer playerIn, List tooltip, boolean advanced) {
 		String usageLangKey = isTicketInUse(stack) ? "transitrailmod.ticket.in_use" : "transitrailmod.ticket.not_in_use";
-		String usageToolTip = I18n.format(usageLangKey, new Object[0]);
+		String usageToolTip = I18n.format(usageLangKey);
 		tooltip.add(usageToolTip);
 		
 		int rides = getRidesRemaining(stack);
-		String ridesToolTip = I18n.format("transitrailmod.ticket.remaining_rides", new Object[0]);
+		String ridesToolTip = I18n.format("transitrailmod.ticket.remaining_rides");
 		tooltip.add(ridesToolTip + ": " + rides);
 		
 		if (rides <= 0) {
-			tooltip.add(I18n.format("transitrailmod.ticket.insufficient_balance", new Object[0]));
+			tooltip.add(I18n.format("transitrailmod.ticket.insufficient_balance"));
 		}
 	}
 	
 	// Interactions
-	public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
+	@Override
+	public EnumActionResult onItemUse(ItemStack stack,
+                                  EntityPlayer playerIn,
+                                  World worldIn,
+                                  BlockPos pos,
+                                  EnumHand hand,
+                                  EnumFacing facing,
+                                  float hitX,
+                                  float hitY,
+                                  float hitZ)
 	{
 		IBlockState state = worldIn.getBlockState(pos);
 		if (!(isTicketInUse(stack)) && !(getRidesRemaining(stack) > 0)) {
-			return false;
+			return EnumActionResult.PASS;
 		} else {
 			if (state.getBlock() == ModBlocks.turnstile_block) {
-				return this.processTicket(stack, playerIn, worldIn, pos, side);
+				return this.processTicket(stack, playerIn, worldIn, pos, facing);
 			} else {
-				return false;
+				return EnumActionResult.PASS;
 			}
 		}
 	}
 	
-	private boolean processTicket(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing facing) {
+	private EnumActionResult processTicket(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing facing) {
 		IBlockState state = worldIn.getBlockState(pos);
 		boolean usage = isTicketInUse(stack);
-		boolean onTheRightSide = (EnumFacing) state.getValue(TurnstileBlock.FACING) == facing.getOpposite();
-		EnumPassingDirection direc = (EnumPassingDirection) state.getValue(TurnstileBlock.PASSING);
+		boolean onTheRightSide = state.getValue(TurnstileBlock.FACING) == facing.getOpposite();
+		EnumPassingDirection direction = (EnumPassingDirection) state.getValue(TurnstileBlock.PASSING);
 		
 		if (onTheRightSide) {
-			if (usage == !direc.isInside()) {
+			if (usage == !direction.isInside()) {
 				stack.damageItem(1, playerIn);
 			}
 			worldIn.setBlockState(pos, state.cycleProperty(TurnstileBlock.ACTIVE));
-			return true;
+			return EnumActionResult.SUCCESS;
 		} else {
-			return false;
+			return EnumActionResult.PASS;
 		}
 	}
 	

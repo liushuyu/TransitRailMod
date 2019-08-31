@@ -79,6 +79,7 @@ public abstract class EntityDetector extends CustomDirectionBlock {
 	// Interactions
 	@Override
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+		pos = new BlockPos(pos);
 		if (!worldIn.isRemote){
 			this.updateState(state, worldIn, pos);
 		}
@@ -108,6 +109,7 @@ public abstract class EntityDetector extends CustomDirectionBlock {
 	}
 	
 	protected int givePower(World worldIn, BlockPos pos){
+		pos = new BlockPos(pos);
 		AxisAlignedBB spaceToCheck = getSpaceToCheck(worldIn, pos);
 		List list = worldIn.getEntitiesWithinAABB(EntityLivingBase.class, spaceToCheck);
 		

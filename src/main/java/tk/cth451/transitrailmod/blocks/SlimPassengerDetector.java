@@ -28,7 +28,7 @@ public class SlimPassengerDetector extends EntityDetector {
 	
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-		switch ((EnumFacing) source.getBlockState(pos).getValue(FACING)) {
+		switch ((EnumFacing) state.getValue(FACING)) {
 		case NORTH:
 			return new AxisAlignedBB(0.0F, 0.0F, 0.0F, 1.0F, 0.1875F, 0.0625F);
 		case EAST:

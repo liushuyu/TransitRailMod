@@ -36,7 +36,7 @@ public class ClosedPlatformTop extends CustomDirectionBlock {
 	// Properties
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-		EnumFacing facing = (EnumFacing) source.getBlockState(pos).getValue(FACING);
+		EnumFacing facing = (EnumFacing) state.getValue(FACING);
 		if (facing == EnumFacing.NORTH) {
 			return new AxisAlignedBB(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.25F);
 		} else if (facing == EnumFacing.EAST) {

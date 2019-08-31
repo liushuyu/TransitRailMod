@@ -1,6 +1,7 @@
 package tk.cth451.transitrailmod.blocks;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
@@ -37,6 +38,7 @@ public class FluorescentLamp extends CustomDirectionBlock {
 				.withProperty(FACING, EnumFacing.NORTH));
 		this.translucent = true;
 		this.fullBlock = false;
+		this.blockSoundType = SoundType.GLASS;
 	}
 	
 	// Properties
@@ -139,7 +141,6 @@ public class FluorescentLamp extends CustomDirectionBlock {
 		} else if ((EnumAttachTo) state.getValue(ATTACH) == EnumAttachTo.CEILING) {
 			switch ((EnumFacing) state.getValue(FACING)) {
 				case NORTH:
-					return new AxisAlignedBB(0.0F, 0.875F, 0.375F, 1.0F, 1.0F, 0.625F);
 				case SOUTH:
 					return new AxisAlignedBB(0.0F, 0.875F, 0.375F, 1.0F, 1.0F, 0.625F);
 				default: // EAST and WEST

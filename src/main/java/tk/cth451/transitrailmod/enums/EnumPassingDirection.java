@@ -25,6 +25,6 @@ public enum EnumPassingDirection implements IStringSerializable {
 	}
 	
 	public boolean isInside() {
-		return this == INSIDE ? true : false;
+		return this == INSIDE;
 	}
 }

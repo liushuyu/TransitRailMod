@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
@@ -17,8 +16,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import tk.cth451.transitrailmod.TransitRailMod;
 import tk.cth451.transitrailmod.blocks.prototype.CustomDirectionBlock;
 import tk.cth451.transitrailmod.enums.EnumPassingDirection;
@@ -68,7 +65,7 @@ public class TurnstileBlock extends CustomDirectionBlock{
 	// Block State
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, new IProperty[] {ACTIVE, PASSING, FACING});
+		return new BlockStateContainer(this, ACTIVE, PASSING, FACING);
 	}
 	
 	// meta: 3211
@@ -77,10 +74,10 @@ public class TurnstileBlock extends CustomDirectionBlock{
 	// 3: passing
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		int mFacing = ((EnumFacing) state.getValue(FACING)).getHorizontalIndex();
-		int mActive = (Boolean) state.getValue(ACTIVE) ? 1 : 0;
+		int mFacing = state.getValue(FACING).getHorizontalIndex();
+		int mActive = state.getValue(ACTIVE) ? 1 : 0;
 		int mPassing = ((EnumPassingDirection) state.getValue(PASSING)).toMeta();
-		return mPassing * 8 + mActive * 4 + mFacing;
+		return (mPassing >> 3) + (mActive >> 2) + mFacing;
 	}
 	
 	@Override
@@ -101,15 +98,15 @@ public class TurnstileBlock extends CustomDirectionBlock{
 	
 	@Override
 	public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
-		if ((Boolean) state.getValue(ACTIVE)){
+		if (state.getValue(ACTIVE)){
 			worldIn.setBlockState(pos, state.withProperty(ACTIVE, false));
 		}
 	}
 	
 	// Appearance
 	@Override
-	public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
-		switch (((EnumFacing) state.getValue(FACING))) {
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+		switch (state.getValue(FACING)) {
 			case NORTH :
 				return new AxisAlignedBB(0.75F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 			case EAST :
@@ -123,50 +120,38 @@ public class TurnstileBlock extends CustomDirectionBlock{
 	
 	@Override
 	public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
-		if (!worldIn.isRemote){
+		if (!worldIn.isRemote) {
+			// make a non-mutable copy
+			pos = new BlockPos(pos);
 			AxisAlignedBB spaceToCheck = getSpaceToCheck(worldIn, pos);
-			List list = worldIn.getEntitiesWithinAABB(EntityLivingBase.class, spaceToCheck);
+			List<EntityLivingBase> list = worldIn.getEntitiesWithinAABB(EntityLivingBase.class, spaceToCheck);
 			
 			worldIn.scheduleUpdate(pos, this, this.tickRate(worldIn));
 			if (list.isEmpty()){
-				if ((Boolean) state.getValue(ACTIVE)){
+				if (state.getValue(ACTIVE)){
 					worldIn.setBlockState(pos, state.withProperty(ACTIVE, false));
 				}
 			}
 		}
 	}
 	
-	protected AxisAlignedBB getBarBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos) {
-		IBlockState state = worldIn.getBlockState(pos);
-		if ((Boolean) state.getValue(ACTIVE)){
-			return null;
+	protected AxisAlignedBB getBarBoundsBasedOnState(IBlockState blockState, BlockPos pos) {
+		AxisAlignedBB bbFromBounds = null;
+		if (blockState.getValue(ACTIVE)) {
+			return NULL_AABB;
 		} else {
-			switch (((EnumFacing) state.getValue(FACING))) {
+			switch (blockState.getValue(FACING)) {
 				case NORTH :
-					return getBBFromBounds(pos, 0.0F, 0.4375F, 0.4375F, 1.0F, 1.5F, 0.5625F);
 				case SOUTH :
-					return getBBFromBounds(pos, 0.0F, 0.4375F, 0.4375F, 1.0F, 1.5F, 0.5625F);
+					bbFromBounds = new AxisAlignedBB(0.0F, 0.4375F, 0.4375F, 1.0F, 1.5F, 0.5625F);
+					break;
 				default : // EAST WEST
-					return getBBFromBounds(pos, 0.4375F, 0.4375F, 0.0F, 0.5625F, 1.5F, 1.0F);
+					bbFromBounds = new AxisAlignedBB(0.4375F, 0.4375F, 0.0F, 0.5625F, 1.5F, 1.0F);
 			}
+			return bbFromBounds;
 		}
 	}
-	
-	// extra bounding box on top of side panel
-	protected AxisAlignedBB getSideBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos) {
-		IBlockState state = worldIn.getBlockState(pos);
-		switch (((EnumFacing) state.getValue(FACING))) {
-			case NORTH :
-				return getBBFromBounds(pos, 0.75F, 1.0F, 0.0F, 1.0F, 1.5F, 1.0F);
-			case EAST :
-				return getBBFromBounds(pos, 0.0F, 1.0F, 0.75F, 1.0F, 1.5F, 1.0F);
-			case SOUTH :
-				return getBBFromBounds(pos, 0.0F, 1.0F, 0.0F, 0.25F, 1.5F, 1.0F);
-			default : // WEST
-				return getBBFromBounds(pos, 0.0F, 1.0F, 0.0F, 1.0F, 1.5F, 0.25F);
-		}
-	}
-	
+
 	private AxisAlignedBB getBBFromBounds (BlockPos pos, double x1, double y1, double z1, double x2, double y2, double z2) {
 		return new AxisAlignedBB(pos.getX() + x1, pos.getY() + y1, pos.getZ() + z1, pos.getX() + x2, pos.getY() + y2, pos.getZ() + z2);
 	}
@@ -176,24 +161,14 @@ public class TurnstileBlock extends CustomDirectionBlock{
 				pos.getX(),
 				pos.getY(),
 				pos.getZ(),
-				pos.getX() + 1,
-				pos.getY() + 1,
-				pos.getZ() + 1);
+				pos.getX() + 1.0,
+				pos.getY() + 1.0,
+				pos.getZ() + 1.0);
 	}
 	
 	@Override
 	public AxisAlignedBB getCollisionBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
-		return this.getSelectedBoundingBox(state, worldIn, pos);
+		return this.getBarBoundsBasedOnState(state, pos);
 	}
-	
-	@Override
-	public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox,
-			List<AxisAlignedBB> collidingBoxes, Entity entityIn) {
-		super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn);
-		AxisAlignedBB axisalignedbb1 = this.getCollisionBoundingBox(state, worldIn, pos);
-		AxisAlignedBB barBound = this.getBarBoundsBasedOnState(worldIn, pos);
-		AxisAlignedBB sideBound = this.getSideBoundsBasedOnState(worldIn, pos);
-		collidingBoxes.add(barBound);
-		collidingBoxes.add(sideBound);
-	}
+
 }
